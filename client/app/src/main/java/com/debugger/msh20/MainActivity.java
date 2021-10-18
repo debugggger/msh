@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
   Button lampButton;
   Button illuminateButton;
   TextView temperatureText;
+  TextView humidityText;
 
   private SharedPreferences pref;
   private Handler mHandler = new Handler();
@@ -41,24 +42,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     lampButton = (Button) findViewById(R.id.bLamp);
     illuminateButton = (Button) findViewById(R.id.bIllumination);
     temperatureText = (TextView) findViewById(R.id.tTemperature);
+    humidityText = (TextView) findViewById(R.id.tHumidity);
     syncButton = (ImageButton) findViewById(R.id.bSync);
 
     settingsButton = (ImageButton) findViewById(R.id.bSettings);
     settingsButton.setOnClickListener(this);
 
     mHandler.removeCallbacks(synchr);
-    mHandler.postDelayed(synchr, 100);
+    mHandler.postDelayed(synchr, 1000);
 
     lampButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        post("lamp");
+        post("lamp1");
       }
     });
     illuminateButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        post("illuminate");
+        post("illuminate1");
       }
     });
     /*syncButton.setOnClickListener(new View.OnClickListener() {
@@ -99,13 +101,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
               {
                 String res = response.body().string();
                 switch (key){
-                  case "lamp":
+                  case "lamp1":
                     lampButton.setText(res);
-                  case "sync":
+                  case "temperature":
                     runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
                         temperatureText.setText(res + "Cº");
+                      }
+                    });
+                  case "humidity":
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        //humidityText.setText(res + "%");
                       }
                     });
                   default:
@@ -125,15 +134,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return ip;
       }
     }
-    return "192.168.0.100";
+    return "192.168.0.123";
   }
 
   private Runnable synchr = new Runnable() {
     @Override
     public void run()
     {
-      post("sync");
-      mHandler.postDelayed(this, 10000);
+      post("temperature");
+      post("humidity");
+      mHandler.postDelayed(this, 1000);
     }
   };
 }
