@@ -1,0 +1,2 @@
+rootProject.name = "MSH20"
+include ':app'
