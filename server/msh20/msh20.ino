@@ -10,9 +10,12 @@ const char* password = "9216411011";  //password
 
 dht11 DHT11;
 
+String response = "";
+
 float temperature;
 float humidity;
 bool isLamp1;
+
 
 WiFiServer server(80);
 
@@ -53,9 +56,16 @@ void loop() {
   }
   // Wait until the client sends some data
   Serial.println("new client");
+  int t = 0;
   while(!client.available())
   {
-    delay(1);
+    delay(100);
+    t++;
+    if (t >= 10)
+    {
+      Serial.println("Client disonnected by time");
+      return;
+    }
   }
    // Read the first line of the request
   String req = client.readStringUntil('\r');
@@ -65,31 +75,48 @@ void loop() {
   client.flush(); 
   // Prepare the response
   String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-  s += temperature;
-  //нужно добавить возврат состояния
+  s += response;
   // Send the response to the client
   client.print(s);
   delay(1);
   Serial.println("Client disonnected");
-
+  s = "";
+  response = "";  
   // The client will actually be disconnected 
   // when the function returns and 'client' object is detroyed
 }
+
   
 void handle(String req,  WiFiClient client)
 {
   if (req.indexOf("/temperature") != -1)
   {
      temperature = getTemperature(PIN_DHT1);
+     response += "@temperature#";
+     response.concat(int(temperature));
+     return;
   }
   else if (req.indexOf("/humidity") != -1)
   {
      humidity = getHumidity(PIN_DHT1);
+     response += "@humidity#";
+     response.concat(int(humidity));
+     return;
   }
   else if (req.indexOf("/lamp1") != -1)
   {
     touchRelay(PIN_LAMP1, isLamp1);
+    response += "@lamp1#";
+    if (isLamp1 == 1)
+    {
+      response += "включить";
+    }
+    else
+    {
+      response += "выключить";
+    }
     isLamp1 = !isLamp1;
+    return;
   }
   else 
   {

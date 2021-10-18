@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -102,21 +103,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String res = response.body().string();
                 switch (key){
                   case "lamp1":
-                    lampButton.setText(res);
+                    lampButton.setText(parseResponse(res));
+                    break;
                   case "temperature":
                     runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
-                        temperatureText.setText(res + "Cº");
+                        temperatureText.setText(parseResponse(res) + " Cº");
                       }
                     });
+                    break;
                   case "humidity":
                     runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
-                        //humidityText.setText(res + "%");
+                        humidityText.setText(parseResponse(res) + " %");
                       }
                     });
+                    break;
                   default:
                     break;
                 }
@@ -125,6 +129,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
       }
     }).start();
+  }
+
+  private String parseResponse(String res){
+    //String result = "";
+    StringTokenizer st = new StringTokenizer(res, "@");
+    String obj1 = st.nextToken();
+    StringTokenizer obj1st = new StringTokenizer(obj1, "#");
+    String obj10Stat = obj1st.nextToken();
+    String result = obj1st.nextToken();
+
+    return result;
   }
 
   private String getIP(){
