@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.MSH20">
+        android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity android:name=".SettingsActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
