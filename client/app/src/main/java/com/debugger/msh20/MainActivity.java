@@ -2,11 +2,13 @@ package com.debugger.msh20;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -70,16 +72,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         post("lamp1");
       }
     });
-    illuminateButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        post("illuminate1");
-      }
-    });
     syncButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         post("synclamp1");
+      }
+    });
+    /*illuminateButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        post("illuminate1");
+      }
+    });*/
+    illuminateButton.setOnTouchListener(new View.OnTouchListener(){
+      long startTime;
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            startTime = System.currentTimeMillis();
+            break;
+          case MotionEvent.ACTION_MOVE:
+            break;
+          case MotionEvent.ACTION_UP:
+          case MotionEvent.ACTION_CANCEL:
+            long totalTime = System.currentTimeMillis() - startTime;
+            long totalSecunds = totalTime / 1000;
+            if( totalSecunds >= 2 )
+            {
+              //вызов окна выбора цвета подсветки
+            }
+            else {
+              post("illuminate1");
+            }
+            break;
+        }
+        return true;
       }
     });
   }
@@ -116,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (key){
                   case "lamp1":
                   case "synclamp1":
-                    //lampButton.setText(parseResponse(res));
-                    setImageState(res);
+                  case "illuminate1":
+                    setImageState(res, stateLamp1View);
                     break;
                   case "temperature":
                     runOnUiThread(new Runnable() {
@@ -177,12 +205,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
   };
 
-  private void setImageState(String res){
+  private void setImageState(String res, ImageView param){
     if (parseResponse(res).equals("включить")){
-      stateLamp1View.setColorFilter(Color.RED);
+      param.setColorFilter(Color.RED);
     }
     else if (parseResponse(res).equals("выключить")){
-      stateLamp1View.setColorFilter(Color.GREEN);
+      param.setColorFilter(Color.GREEN);
     }
   }
 }
