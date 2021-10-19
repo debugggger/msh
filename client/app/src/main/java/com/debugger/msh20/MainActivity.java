@@ -64,12 +64,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         post("illuminate1");
       }
     });
-    /*syncButton.setOnClickListener(new View.OnClickListener() {
+    syncButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        post("sync");
+        post("synclamp1");
       }
-    });*/
+    });
   }
 
   @Override
@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String res = response.body().string();
                 switch (key){
                   case "lamp1":
+                    lampButton.setText(parseResponse(res));
+                  case "synclamp1":
                     lampButton.setText(parseResponse(res));
                     break;
                   case "temperature":
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
       post("temperature");
       post("humidity");
+      post("synclamp1");
       mHandler.postDelayed(this, 1000);
     }
   };

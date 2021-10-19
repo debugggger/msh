@@ -76,6 +76,7 @@ void loop() {
   // Prepare the response
   String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
   s += response;
+  Serial.println(s);
   // Send the response to the client
   client.print(s);
   delay(1);
@@ -87,7 +88,7 @@ void loop() {
 }
 
   
-void handle(String req,  WiFiClient client)
+void handle(String req, WiFiClient client)
 {
   if (req.indexOf("/temperature") != -1)
   {
@@ -116,6 +117,19 @@ void handle(String req,  WiFiClient client)
       response += "выключить";
     }
     isLamp1 = !isLamp1;
+    return;
+  }
+  else if (req.indexOf("/synclamp1") != -1)
+  {
+    response += "@lamp1#";
+    if (isLamp1 == 0)
+    {
+      response += "включить";
+    }
+    else
+    {
+      response += "выключить";
+    }
     return;
   }
   else 
