@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
   ImageButton settingsButton;
   ImageButton syncButton;
+  ImageView stateLamp1View;
+  ImageView stateIllumin1View;
   Button lampButton;
   Button illuminateButton;
   TextView temperatureText;
@@ -48,12 +52,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     temperatureText = (TextView) findViewById(R.id.tTemperature);
     humidityText = (TextView) findViewById(R.id.tHumidity);
     syncButton = (ImageButton) findViewById(R.id.bSync);
+    stateLamp1View = (ImageView) findViewById(R.id.imLamp);
+    stateIllumin1View = (ImageView) findViewById(R.id.imIllumination);
 
     settingsButton = (ImageButton) findViewById(R.id.bSettings);
     settingsButton.setOnClickListener(this);
 
     mHandler.removeCallbacks(synchr);
     mHandler.postDelayed(synchr, 1000);
+
+    stateLamp1View.setColorFilter(Color.DKGRAY);
+    stateIllumin1View.setColorFilter(Color.DKGRAY);
 
     lampButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -106,9 +115,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String res = response.body().string();
                 switch (key){
                   case "lamp1":
-                    lampButton.setText(parseResponse(res));
                   case "synclamp1":
-                    lampButton.setText(parseResponse(res));
+                    //lampButton.setText(parseResponse(res));
+                    setImageState(res);
                     break;
                   case "temperature":
                     runOnUiThread(new Runnable() {
@@ -167,4 +176,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       mHandler.postDelayed(this, 1000);
     }
   };
+
+  private void setImageState(String res){
+    if (parseResponse(res).equals("включить")){
+      stateLamp1View.setColorFilter(Color.RED);
+    }
+    else if (parseResponse(res).equals("выключить")){
+      stateLamp1View.setColorFilter(Color.GREEN);
+    }
+  }
 }
