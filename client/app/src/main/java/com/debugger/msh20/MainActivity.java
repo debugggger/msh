@@ -2,13 +2,11 @@ package com.debugger.msh20;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -50,12 +48,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     pref = getSharedPreferences("IP_Pref", MODE_PRIVATE);
 
     lampButton = (Button) findViewById(R.id.bLamp);
-    illuminateButton = (Button) findViewById(R.id.bIllumination);
     temperatureText = (TextView) findViewById(R.id.tTemperature);
     humidityText = (TextView) findViewById(R.id.tHumidity);
     syncButton = (ImageButton) findViewById(R.id.bSync);
     stateLamp1View = (ImageView) findViewById(R.id.imLamp);
     stateIllumin1View = (ImageView) findViewById(R.id.imIllumination);
+    illuminateButton = (Button) findViewById(R.id.bIllumination);
 
     settingsButton = (ImageButton) findViewById(R.id.bSettings);
     settingsButton.setOnClickListener(this);
@@ -78,36 +76,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         post("synclamp1");
       }
     });
-    /*illuminateButton.setOnClickListener(new View.OnClickListener() {
+    illuminateButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        post("illuminate1");
-      }
-    });*/
-    illuminateButton.setOnTouchListener(new View.OnTouchListener(){
-      long startTime;
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            startTime = System.currentTimeMillis();
-            break;
-          case MotionEvent.ACTION_MOVE:
-            break;
-          case MotionEvent.ACTION_UP:
-          case MotionEvent.ACTION_CANCEL:
-            long totalTime = System.currentTimeMillis() - startTime;
-            long totalSecunds = totalTime / 1000;
-            if( totalSecunds >= 2 )
-            {
-              //вызов окна выбора цвета подсветки
-            }
-            else {
-              post("illuminate1");
-            }
-            break;
-        }
-        return true;
+        post("illuminate1" + "@" + getColour());
       }
     });
   }
@@ -144,8 +116,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (key){
                   case "lamp1":
                   case "synclamp1":
-                  case "illuminate1":
                     setImageState(res, stateLamp1View);
+                    break;
+                  case "illuminate1@White":
+                  case "illuminate1@Red":
+                  case "illuminate1@Blue":
+                  case "illuminate1@Yellow":
+                  case "illuminate1@Green":
+                  case "illuminate1@Rainbow":
+                  case "syncIllum1":
+                    setImageState(res, stateIllumin1View);
                     break;
                   case "temperature":
                     runOnUiThread(new Runnable() {
@@ -194,6 +174,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     return "192.168.0.123";
   }
 
+  private String getColour(){
+    String colour = pref.getString("colour", "");
+    if (colour != null){
+      if(!colour.isEmpty()){
+        return colour;
+      }
+    }
+    return "White";
+  }
+
   private Runnable synchr = new Runnable() {
     @Override
     public void run()
@@ -201,15 +191,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       post("temperature");
       post("humidity");
       post("synclamp1");
+      post("syncIllum1");
       mHandler.postDelayed(this, 1000);
     }
   };
 
   private void setImageState(String res, ImageView param){
-    if (parseResponse(res).equals("включить")){
+    if (parseResponse(res).equals("off")){
       param.setColorFilter(Color.RED);
     }
-    else if (parseResponse(res).equals("выключить")){
+    else if (parseResponse(res).equals("on")){
       param.setColorFilter(Color.GREEN);
     }
   }
